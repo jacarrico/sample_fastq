@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import sys
-import os
 import subprocess
 
 def main():
@@ -37,7 +35,7 @@ def main():
     print ("Estimated coverage: "+str(EstCov))
     Ratio = TargetDepth/EstCov
 
-    print(Ratio)
+    print("Subsample target ratio:"+str(Ratio))
     if Ratio < 1:
         print ("Writing R1.fq.gz")
         ps = subprocess.Popen(('seqtk', 'sample','-s100', P1, str(Ratio)), stdout=subprocess.PIPE)
@@ -53,8 +51,6 @@ def main():
         print("All done. Have a nice day!")
     else:
         print("WARNING: Original depth lower than target depth: Exiting")
-
-
 
 if __name__ == "__main__":
         main()
