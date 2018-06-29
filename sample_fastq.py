@@ -36,5 +36,6 @@ def main():
    #print(R1_fqchk.stdout.readline())
     print("=====")
     #print (R2_fqchk.stdout)
+    #gg
 if __name__ == "__main__":
         main()
