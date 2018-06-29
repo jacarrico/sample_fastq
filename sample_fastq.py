@@ -24,18 +24,32 @@ def main():
 
     R1_fqchk = subprocess.Popen(['seqtk', 'fqchk', P1], stdout=subprocess.PIPE)
     R1_stdout, R1_stderr = R1_fqchk.communicate()
-    print(int(R1_stdout.splitlines()[2].split()[1]))
+    B_P1=int(R1_stdout.splitlines()[2].split()[1])
+    print("Bases P1:"+str(B_P1))
 
     R2_fqchk = subprocess.Popen(['seqtk', 'fqchk', P2], stdout=subprocess.PIPE)
-    R2_stdout, R2_stderr = R1_fqchk.communicate()
-    print(int(R2_stdout.splitlines()[2].split()[1]))
+    R2_stdout, R2_stderr = R2_fqchk.communicate()
+    B_P2= int(R2_stdout.splitlines()[2].split()[1])
+    print("Bases P2:"+str(B_P2))
+    print("")
 
-    #R2_fqchk = subprocess.Popen(['seqtk', 'fqchk', P2, ],stdout=subprocess.PIPE)
+    EstCov = (B_P1 + B_P2)/ (GenomeSize * 1E6)
+    print ("Estimated coverage: "+str(EstCov))
+    Ratio = TargetDepth/EstCov
+
+    print(Ratio)
+    if Ratio < 1:
+        ps = subprocess.Popen(('seqtk', 'sample', P1, str(Ratio)), stdout=subprocess.PIPE)
+        with open('R1.fq.gz','w') as outfile:
+            output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
+        ps.wait()
+
+       ps = subprocess.Popen(('seqtk', 'sample', '-s 100', P2, str(Ratio)), stdout=subprocess.PIPE)
+        with open('R2.fq.gz','w') as outfile:
+            output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
+        ps.wait()
 
 
-   #print(R1_fqchk.stdout.readline())
-    print("=====")
-    #print (R2_fqchk.stdout)
-    #gg
+
 if __name__ == "__main__":
         main()
