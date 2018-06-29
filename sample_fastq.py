@@ -39,15 +39,20 @@ def main():
 
     print(Ratio)
     if Ratio < 1:
-        ps = subprocess.Popen(('seqtk', 'sample', P1, str(Ratio)), stdout=subprocess.PIPE)
+        print ("Writing R1.fq.gz")
+        ps = subprocess.Popen(('seqtk', 'sample','-s100', P1, str(Ratio)), stdout=subprocess.PIPE)
         with open('R1.fq.gz','w') as outfile:
             output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
         ps.wait()
 
-       ps = subprocess.Popen(('seqtk', 'sample', '-s 100', P2, str(Ratio)), stdout=subprocess.PIPE)
+        print ("Writing R2.fq.gz")
+        ps = subprocess.Popen(('seqtk', 'sample', '-s100', P2, str(Ratio)), stdout=subprocess.PIPE)
         with open('R2.fq.gz','w') as outfile:
             output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
         ps.wait()
+        print("All done. Have a nice day!")
+    else:
+        print("WARNING: Original depth lower than target depth: Exiting")
 
 
 
