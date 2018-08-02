@@ -13,6 +13,9 @@ def main():
     parser.add_argument('-P2', nargs='?', type=str, help='Paired End fastq.gz 2', required=True)
     parser.add_argument('-gs', nargs='?', type=float, help='genome size (MB)', required=True)
     parser.add_argument('-tdep', nargs='?', type=int, help="Target desired depth", required=True)
+    parser.add_argument('--compSoft', choices=['pigz', 'gzip'], type=str, metavar='pigz', default='pigz',
+                        help='Compression software for subsampled reads compression (available options: %(choices)s)',
+                        required=False)
     args = parser.parse_args()
 
     GenomeSize = args.gs
@@ -37,16 +40,16 @@ def main():
 
     print("Subsample target ratio:"+str(Ratio))
     if Ratio < 1:
-        print ("Writing R1.fq.gz")
+        print ("Writing read_1.fq.gz")
         ps = subprocess.Popen(('seqtk', 'sample','-s100', P1, str(Ratio)), stdout=subprocess.PIPE)
-        with open('R1.fq.gz','w') as outfile:
-            output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
+        with open('read_1.fq.gz','w') as outfile:
+            output = subprocess.Popen((args.compSoft, '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
         ps.wait()
 
-        print ("Writing R2.fq.gz")
+        print ("Writing read_2.fq.gz")
         ps = subprocess.Popen(('seqtk', 'sample', '-s100', P2, str(Ratio)), stdout=subprocess.PIPE)
-        with open('R2.fq.gz','w') as outfile:
-            output = subprocess.Popen(('pigz', '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
+        with open('read_2.fq.gz','w') as outfile:
+            output = subprocess.Popen((args.compSoft, '--fast', '-c'), stdin=ps.stdout, stdout=outfile )
         ps.wait()
         print("All done. Have a nice day!")
     else:
